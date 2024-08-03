@@ -34,7 +34,16 @@ jobs:
       run: ./build.gradle.adapt.for.github.workflow.sh ${GSM_API_KEY}
 
     - name: adapt sources and res files to build different brand
-      run: ./change.R.package.sh TennisPadel
+      run: | 
+        set -x
+        brand=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+        ./change.R.package.sh $brand
+
+    - name: Extract the version from build.gradle
+      id: extract_version
+      run: |
+        VERSION=$(grep '^\s*versionCode' build.gradle | cut -d '+' -f 2 | sort -u | tr -d ' ')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Build unsigned release .apk files
       run: ./gradlew build
@@ -44,39 +53,23 @@ jobs:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
       run: |
-        echo "${KEYSTORE_BASE64}" | base64 -d > apksign.keystore
         set -x
+        brand=${{ matrix.brand }}
+        echo "${KEYSTORE_BASE64}" | base64 -d > apksign.keystore
         androidhome="${ANDROID_HOME:-${ANDROID_SDK}}"
         for unsignedFn in build/outputs/apk/*/release/*.apk; do
-          signedFn=${unsignedFn/release-unsigned/release-signed}
+          unbrandedSignedFn=${unsignedFn/release-unsigned/release-signed}
+          signedFn=${unbrandedSignedFn/Squore/${brand}.${{ steps.extract_version.outputs.version }}}
           ${androidhome}/build-tools/$(ls ${androidhome}/build-tools/ | tail -1)/apksigner sign --ks apksign.keystore --ks-pass pass:"${KEYSTORE_PASSWORD}" --out "${signedFn}" "${unsignedFn}"
         done
         rm -v apksign.keystore
 
-    - name: Extract the version from build.gradle
-      id: extract_version
-      run: |
-        VERSION=$(grep '^\s*versionCode' build.gradle | cut -d '+' -f 2 | sort -u | tr -d ' ')
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Upload artifact for phone
-      uses: actions/upload-artifact@v4.3.4
+    - name: Create upload .apk to /releases (softprops)
+      uses: softprops/action-gh-release@v2
       with:
-        name: TennisPadel.phone.${{ steps.extract_version.outputs.version }}.apk
-        path: build/outputs/apk/phoneTabletPost23/release/TennisPadel-phoneTabletPost23-release-signed.apk
-
-    - name: Upload artifact for wearOs
-      uses: actions/upload-artifact@v4.3.4
-      with:
-        name: TennisPadel.wearOs.${{ steps.extract_version.outputs.version }}.apk
-        path: build/outputs/apk/wearOs/release/TennisPadel-wearOs-release-signed.apk
-
-    - name: Create upload .apk to /releases
-      uses: ncipollo/release-action@v1
-      with:
+        draft: true # Sets the release as a draft instead of publishing it, allowing you to make any edits needed before releasing
         token: ${{ secrets.GH_ACCESS_TOKEN }}
-        tag: "${{ steps.extract_version.outputs.version }}"
-        #prerelease: "${{ steps.extract_version.outputs.beta }}"
-        draft: true
-        artifacts: ./build/outputs/apk/*/release/*-*-release-signed.apk
-        generateReleaseNotes: false
+        tag_name: "Release.${{ steps.extract_version.outputs.version }}"
+        files: ./build/outputs/apk/*/release/*-*-release-signed.apk
+        generate_release_notes: false
