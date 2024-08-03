@@ -22,8 +22,8 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v4.1.7
       with:
-        repository: obbimi/Squore
-        ref: main
+        repository: obbimi/Squore # overwrite the default ${{ github.repository }}
+        #ref: main
 
     - name: Make pipeline script files executable where needed
       run: chmod +x ./gradlew ./build.gradle.adapt.for.github.workflow.sh ./change.R.package.sh
