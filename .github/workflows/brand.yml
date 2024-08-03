@@ -59,7 +59,7 @@ jobs:
         androidhome="${ANDROID_HOME:-${ANDROID_SDK}}"
         for unsignedFn in build/outputs/apk/*/release/*.apk; do
           unbrandedSignedFn=${unsignedFn/release-unsigned/release-signed}
-          signedFn=${unbrandedSignedFn/Squore/${brand}.${{ steps.extract_version.outputs.version }}}
+          signedFn=${unbrandedSignedFn/${brand}/${brand}.${{ steps.extract_version.outputs.version }}}
           ${androidhome}/build-tools/$(ls ${androidhome}/build-tools/ | tail -1)/apksigner sign --ks apksign.keystore --ks-pass pass:"${KEYSTORE_PASSWORD}" --out "${signedFn}" "${unsignedFn}"
         done
         rm -v apksign.keystore
