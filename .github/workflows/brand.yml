@@ -87,7 +87,8 @@ jobs:
         track: alpha # alpha,beta,internal or production
         status: inProgress
         inAppUpdatePriority: 2
-        userFraction: 0.10
+        #userFraction: 0.10 # not possible in alpha
         #whatsNewDirectory: distribution/whatsnew
         #mappingFile: app/build/outputs/mapping/release/mapping.txt
         #debugSymbols: app/intermediates/merged_native_libs/release/out/lib
+        # "Error: The first release on a track cannot be staged"
