@@ -37,7 +37,7 @@ jobs:
       run: | 
         set -x
         brand=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-        ./change.R.package.sh $brand
+        ./change.R.package.sh ${brand}
 
     - name: Extract the version from build.gradle
       id: extract_version
