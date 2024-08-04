@@ -62,7 +62,7 @@ jobs:
           unbrandedSignedFn=${unsignedFn/release-unsigned/release-signed}
           signedFn=${unbrandedSignedFn/${brand}/${brand}.${{ steps.extract_version.outputs.version }}}
           ${androidhome}/build-tools/$(ls ${androidhome}/build-tools/ | tail -1)/apksigner sign --ks apksign.keystore --ks-pass pass:"${KEYSTORE_PASSWORD}" --out "${signedFn}" "${unsignedFn}"
-          cp - v ${signedFn} . # for 'Publish' step to not have to specify full paths 
+          cp -v ${signedFn} . # for 'Publish' step to not have to specify full paths 
         done
         rm -v apksign.keystore
         echo $PWD
