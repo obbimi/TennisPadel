@@ -62,11 +62,14 @@ jobs:
           unbrandedSignedFn=${unsignedFn/release-unsigned/release-signed}
           signedFn=${unbrandedSignedFn/${brand}/${brand}.${{ steps.extract_version.outputs.version }}}
           ${androidhome}/build-tools/$(ls ${androidhome}/build-tools/ | tail -1)/apksigner sign --ks apksign.keystore --ks-pass pass:"${KEYSTORE_PASSWORD}" --out "${signedFn}" "${unsignedFn}"
+          cp - v ${signedFn} $(basename ${signedFn}) # for 'Publish' step to not have to specify full paths 
         done
         rm -v apksign.keystore
+        echo $PWD
+        ls -l *.apk # verify 
 
 
-    - name: Create upload .apk to /releases (softprops)
+    - name: Create and upload .apk to /releases (softprops)
       uses: softprops/action-gh-release@v2
       with:
         draft: true # Sets the release as a draft instead of publishing it, allowing you to make any edits needed before releasing
@@ -74,3 +77,17 @@ jobs:
         tag_name: "Release.${{ steps.extract_version.outputs.version }}"
         files: ./build/outputs/apk/*/release/*-*-release-signed.apk
         generate_release_notes: false
+
+    - name: Publish to google play store
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+        packageName: com.doubleyellow.tennispadel
+        releaseFiles: ./TennisPadel.${{ steps.extract_version.outputs.version }}-phoneTabletPost23-release-signed.apk, ./TennisPadel.${{ steps.extract_version.outputs.version }}-phoneTabletPre22-release-signed.apk
+        track: alpha # alpha,beta, production
+        status: inProgress
+        inAppUpdatePriority: 2
+        userFraction: 0.10
+        #whatsNewDirectory: distribution/whatsnew
+        #mappingFile: app/build/outputs/mapping/release/mapping.txt
+        #debugSymbols: app/intermediates/merged_native_libs/release/out/lib
