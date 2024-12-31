@@ -89,5 +89,5 @@ jobs:
         token: ${{ secrets.GH_ACCESS_TOKEN }}
         tag: "Release.${{ steps.prepare_for_build.outputs.version }}"
         artifacts: ./build/outputs/apk/*/release/*-*-release-signed.apk
-        generateReleaseNotes: {{ inputs.generateReleaseNotes }}
+        generateReleaseNotes: ${{ inputs.generateReleaseNotes }}
         #make_latest: true
