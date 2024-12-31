@@ -1,5 +1,12 @@
-# written in such a way that this exact same file can be created in .github/workflows in obbimi/Squore, obbimi/TennisPadel, obbimi/Tabletennis, obbimi/Badminton etc to create obbimi/xxx/Release.###
-# please not all 4 secrets: GSM_API_KEY, KEYSTORE_BASE64, KEYSTORE_PASSWORD, GH_ACCESS_TOKEN need to be present in each repo
+#
+# written in such a way that this exact same file can be created in .github/workflows in
+# obbimi/Squore
+# obbimi/TennisPadel
+# obbimi/Tabletennis
+# obbimi/Badminton etc to create obbimi/xxx/Release.###
+#
+# please note that all 4 secrets (GSM_API_KEY, KEYSTORE_BASE64, KEYSTORE_PASSWORD, GH_ACCESS_TOKEN) need to be present in EACH repo
+#
 name: Build APK & Create Release
 
 on:
@@ -64,7 +71,7 @@ jobs:
         rm -v apksign.keystore
         find . -name *.apk
 
-    - name: Create upload .apk to /releases
+    - name: Upload .apk to /releases
       uses: ncipollo/release-action@v1
       with:
         draft: true # Sets the release as a draft instead of publishing it, allowing you to make any edits needed before releasing
