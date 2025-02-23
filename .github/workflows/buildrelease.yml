@@ -42,6 +42,9 @@ jobs:
         repository: obbimi/Squore # overwrite the default ${{ github.repository }}. Our java code/resources is always in the Squore repo
         #ref: main
 
+    - name: Setup Android SDK - for local 'act' usage only
+      uses: android-actions/setup-android@v2.0.10
+
     - name: Prepare for build
       id: prepare_for_build
       env:
