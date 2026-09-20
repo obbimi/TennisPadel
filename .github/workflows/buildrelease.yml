@@ -43,14 +43,14 @@ jobs:
         distribution: 'adopt'
 
     - name: Checkout the code
-      uses: actions/checkout@v6.0.2
+      uses: actions/checkout@v7.0.1
       with:
         ref: ${{ inputs.branch }}
         repository: obbimi/Squore # overwrite the default ${{ github.repository }}. Our java code/resources is always in the Squore repo
         token: ${{ secrets.GH_ACCESS_TOKEN }}
 
     - name: Setup Android SDK - for local 'act' usage only
-      uses: android-actions/setup-android@v3.2.2
+      uses: android-actions/setup-android@v4.0.4
 
     - name: Prepare for build
       id: prepare_for_build
